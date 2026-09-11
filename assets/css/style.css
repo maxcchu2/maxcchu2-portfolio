@@ -1,0 +1,616 @@
+@import "../fonts/fonts.css";
+
+/* ============================================================
+   Max Chu — portfolio
+   Full white. Everything pinned to the right. The left is
+   deliberately empty.
+   ============================================================ */
+
+:root {
+  --page: #ffffff;
+  --text: #1a1a1a;
+  --muted: #9a9a97;
+  --line: #ececea;
+  --mark-a: #8b78ea;
+  --mark-b: #cabff8;
+  --sel: var(--mark-a);
+
+  --font: "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+
+  --bay: min(50%, 528px);
+  --bay-right: clamp(52px, 15vw, 280px);   /* gap from the right edge — nudges the column toward centre */
+  --intro-w: 40ch;
+  --pad-y: clamp(56px, 9vw, 116px);
+  --block-gap: clamp(52px, 7.5vw, 100px);
+
+  --fs: 0.9375rem;
+  --fs-sm: 0.8125rem;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root[data-theme="dark"] {
+  --page: #121211; --text: #ededeb; --muted: #77776f; --line: #292927;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="special"]) {
+    --page: #121211; --text: #ededeb; --muted: #77776f; --line: #292927;
+  }
+}
+:root[data-theme="special"] {
+  --page: #3a5be0; --text: #ffe11a; --muted: #b9c6ff;
+  --line: rgba(255, 255, 255, 0.22); --sel: #ffe11a;
+}
+:root[data-theme="special"] ::selection { color: #3a5be0; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: 1.62;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; height: auto; }
+p { margin: 0 0 1.15em; }
+[hidden] { display: none !important; }
+
+::selection { background: var(--sel); color: #fff; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+.skip {
+  position: fixed; top: 12px; left: 12px; z-index: 50;
+  background: var(--text); color: var(--page); padding: 9px 13px; font-size: var(--fs-sm);
+  transform: translateY(-160%); transition: transform 0.2s var(--ease);
+}
+.skip:focus { transform: none; }
+
+/* ============================================================
+   Right-anchored column
+   ============================================================ */
+.sheet {
+  padding: var(--pad-y) var(--bay-right);
+}
+.bay { max-width: var(--bay); margin-left: auto; }
+@media (max-width: 900px) {
+  :root { --bay: 100%; --bay-right: clamp(20px, 6vw, 40px); }
+}
+
+.eyebrow { font-size: var(--fs-sm); color: var(--muted); margin: 0 0 20px; }
+
+.top {
+  max-width: var(--intro-w);
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: clamp(26px, 4.5vw, 46px);
+}
+.mark {
+  display: block;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 70% 74%, #ffffff 0%, var(--mark-b) 42%, var(--mark-a) 100%);
+  flex: none;
+}
+.tools, .viewtoggle { display: flex; align-items: center; gap: 2px; }
+.tools button, .viewtoggle button, .tools a {
+  border: 0; background: none; padding: 7px; margin: -7px 0;
+  color: var(--muted); cursor: pointer; line-height: 0;
+  transition: color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.tools button:hover, .viewtoggle button:hover, .tools a:hover { color: var(--text); }
+.tools button:active, .viewtoggle button:active, .tools a:active { transform: scale(0.88); }
+.tools svg, .viewtoggle svg { width: 15px; height: 15px; display: block; }
+.viewtoggle button[aria-pressed="true"] { color: var(--text); }
+:root[data-theme="special"] .tools button[data-act="special"] { color: var(--text); }
+
+.intro { max-width: var(--intro-w); }
+.intro strong { font-weight: 500; }
+.intro a { border-bottom: 1px solid var(--line); transition: border-color 0.2s var(--ease); }
+.intro a:hover { border-color: currentColor; }
+
+/* ============================================================
+   Selected work — image filmstrip or a column list
+   ============================================================ */
+.work { margin-top: var(--block-gap); }
+.work__bar {
+  max-width: var(--intro-w);
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.work__bar .eyebrow { margin: 0; }
+
+.work[data-view="list"] .rail,
+.work[data-view="grid"] .worklist { display: none; }
+
+.rail {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 1.4vw, 18px);
+  margin-right: calc(-1 * var(--bay-right));
+  padding-right: var(--bay-right);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail.dragging { cursor: grabbing; user-select: none; }
+
+.slide { flex: none; scroll-snap-align: start; }
+.slide img {
+  height: clamp(168px, 24vh, 264px);
+  width: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--line);
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* column list — same width as the experiences list */
+.worklist { border-top: 1px solid var(--line); }
+.wrow {
+  display: grid;
+  grid-template-columns: minmax(0, var(--intro-w)) 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  transition: color 0.2s var(--ease);
+}
+.wrow__lead {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; min-width: 0;
+}
+.wrow__title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wrow__yr { flex: none; color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.wrow__cat { color: var(--muted); font-size: var(--fs-sm); text-align: right; white-space: nowrap; }
+@media (hover: hover) {
+  .worklist:hover .wrow { color: var(--muted); }
+  .worklist:hover .wrow:hover { color: var(--text); }
+}
+@media (max-width: 560px) {
+  .wrow { grid-template-columns: 1fr auto; gap: 1.25rem; }
+  .wrow__yr { display: none; }
+}
+
+/* the hovered project, peeking into the empty left space */
+.peek {
+  position: fixed;
+  left: clamp(16px, 5vw, 80px);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(42vw, 600px);
+  height: min(64vh, 460px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease);
+}
+.peek.on { opacity: 1; }
+.peek img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  object-position: left center;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+@media (max-width: 900px), (hover: none) { .peek { display: none; } }
+@media (prefers-reduced-motion: reduce) { .peek, .peek img { transition: opacity 0.12s linear; } }
+
+/* a quiet presence in the empty left void — a soft glow that drifts
+   toward wherever the cursor is, so the space reads as intentional
+   rather than simply unused */
+.ambient {
+  position: fixed;
+  left: var(--ax, 20vw);
+  top: var(--ay, 40vh);
+  translate: -50% -50%;
+  width: min(46vw, 620px);
+  height: min(46vw, 620px);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--mark-a) 20%, transparent), transparent 72%);
+  filter: blur(46px);
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s var(--ease);
+}
+.ambient.on { opacity: 1; }
+@media (max-width: 900px), (hover: none) { .ambient { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ambient { display: none; } }
+
+/* a bunny that quietly appears over the bottom edge once you've
+   scrolled all the way down — a reward for reaching the end */
+.bunny {
+  position: fixed;
+  left: clamp(60px, 16vw, 210px);
+  bottom: -110px;
+  width: clamp(80px, 7.4vw, 104px);
+  color: var(--text);
+  translate: -50% 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: bottom 0.7s var(--ease);
+}
+.bunny svg { width: 100%; height: auto; display: block; }
+.bunny__nose { fill: var(--mark-a); }
+.bunny__blush { fill: color-mix(in srgb, var(--mark-a) 30%, transparent); }
+.bunny__inner { opacity: 0.35; }
+.bunny__scarf { stroke: var(--mark-a); }
+.bunny.show { bottom: -20px; }
+@media (max-width: 900px) { .bunny { display: none; } }
+@media (prefers-reduced-motion: reduce) { .bunny { transition: none; } }
+
+/* ============================================================
+   Experiences
+   ============================================================ */
+.exp { margin-top: var(--block-gap); }
+.row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 1.1rem;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+.row:last-child { border-bottom: 1px solid var(--line); }
+.row time { color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.row b { font-weight: 500; }
+.row span { color: var(--muted); }
+@media (max-width: 480px) { .row { grid-template-columns: 1fr; gap: 0.15rem; } }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.foot {
+  margin-top: var(--block-gap);
+  font-size: var(--fs-sm); color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 6px 24px;
+}
+.foot a { color: var(--text); }
+.foot a:hover { color: var(--muted); }
+
+/* ============================================================
+   Project case — a single right-anchored column, same axis as
+   home. No sidebar: the mark, tools and a "next" nod at the top
+   are exactly where they are on the home page.
+   ============================================================ */
+.sheet--case { padding: var(--pad-y) var(--bay-right); }
+.tools a.tools__next {
+  margin-left: 4px; padding-left: 10px;
+  border-left: 1px solid var(--line);
+}
+
+.case__body h1 { font-size: 1.375rem; line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 6px; }
+.case__meta { font-size: var(--fs-sm); color: var(--muted); margin: 0 0 clamp(22px, 3.5vw, 36px); }
+.case__text { max-width: 46ch; }
+.case__text p { margin: 0 0 0.85em; }
+.case__text p:last-child { margin-bottom: 0; }
+.case__facts {
+  display: grid; grid-template-columns: 7.5rem 1fr; gap: 7px 1.1rem;
+  font-size: var(--fs-sm); border-top: 1px solid var(--line);
+  padding-top: 16px; margin: clamp(26px, 4vw, 40px) calc(-1 * var(--bay-right)) var(--block-gap) 0;
+}
+.case__facts dt { color: var(--muted); }
+.case__facts dd { margin: 0; }
+/* shots bleed to the real right edge, same move as the home rail */
+.case__shots {
+  display: flex; flex-direction: column; gap: clamp(12px, 2vw, 20px);
+  margin-right: calc(-1 * var(--bay-right));
+}
+.case__shots img { width: 100%; display: block; background: var(--line); cursor: zoom-in; }
+.case__row { display: flex; gap: clamp(12px, 2vw, 20px); }
+.case__row img { flex: 1 1 0; min-width: 0; }
+
+/* a slot that quietly crossfades between a few near-identical shots
+   instead of giving each its own row — opt in per project */
+.case__slide { position: relative; display: grid; aspect-ratio: 16 / 9; overflow: hidden; }
+.case__slide img {
+  grid-area: 1 / 1;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease);
+}
+.case__slide img.shown { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .case__slide img { transition: none; } }
+
+/* the hairline rules frame the same width as the images above them */
+.case__nav {
+  margin: var(--block-gap) calc(-1 * var(--bay-right)) 0 0;
+  padding-top: 16px; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: 2rem; font-size: var(--fs-sm);
+}
+.case__step {
+  display: flex; align-items: center; gap: 7px;
+  color: var(--muted); min-width: 0;
+}
+.case__step:hover { color: var(--text); }
+.case__step svg { flex: none; width: 15px; height: 15px; }
+.case__step span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .case__shots, .case__facts, .case__nav { margin-right: 0; }
+}
+@media (max-width: 480px) {
+  .case__step span { max-width: 30vw; }
+  .case__facts { grid-template-columns: 1fr; gap: 2px 0; }
+  .case__facts dt { margin-top: 8px; }
+}
+
+/* ============================================================
+   Project modal — a pane of frosted glass over the page
+   ============================================================ */
+.modal, .zoom { position: fixed; inset: 0; z-index: 200; }
+.zoom { z-index: 210; }
+.modal[hidden], .zoom[hidden] { display: none; }
+
+.modal__scrim, .zoom__scrim {
+  position: absolute; inset: 0;
+  background: rgba(18, 18, 18, 0.12);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+:root[data-theme="dark"] .modal__scrim,
+:root[data-theme="dark"] .zoom__scrim { background: rgba(0, 0, 0, 0.4); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="special"]) .modal__scrim,
+  :root:not([data-theme="light"]):not([data-theme="special"]) .zoom__scrim { background: rgba(0, 0, 0, 0.4); }
+}
+
+.modal__card {
+  position: relative;
+  width: min(620px, calc(100vw - 2 * clamp(16px, 5vw, 56px)));
+  max-height: min(760px, 84vh);
+  margin: clamp(20px, 7vh, 80px) auto;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--page) 46%, transparent);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  backdrop-filter: blur(32px) saturate(1.8);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .modal__card { background: color-mix(in srgb, var(--page) 94%, transparent); }
+}
+.modal__body { padding: clamp(22px, 3vw, 40px); }
+
+.modal__close {
+  position: absolute;
+  top: clamp(12px, 3vh, 24px);
+  right: clamp(12px, 3vw, 24px);
+  z-index: 2;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+  opacity: 0.55;
+}
+.modal__close:hover { opacity: 1; transform: rotate(90deg); }
+.modal__close svg { width: 15px; height: 15px; }
+
+/* step to the previous/next project without leaving the modal */
+.modal__nav {
+  position: fixed;
+  top: 50%; translate: 0 -50%;
+  z-index: 201;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 0; background: none;
+  color: var(--text);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease);
+}
+.modal__nav:hover { opacity: 1; }
+.modal__nav svg { width: 22px; height: 22px; }
+.modal__prev { left: clamp(6px, 2vw, 22px); }
+.modal__next { right: clamp(6px, 2vw, 22px); }
+@media (max-width: 700px) { .modal__nav { display: none; } }
+
+.modal__head { margin-bottom: clamp(20px, 3vw, 32px); max-width: 46ch; }
+.modal__head h2 { font-size: 1.4rem; font-weight: 500; letter-spacing: -0.015em; margin: 0 0 6px; }
+.modal__meta { font-size: var(--fs-sm); color: var(--muted); margin: 0 0 16px; }
+.modal__desc { margin: 0 0 0.85em; font-size: var(--fs-sm); line-height: 1.66; color: var(--text); }
+.modal__desc:last-child { margin-bottom: 0; }
+
+.modal__body img {
+  width: 100%;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  margin-top: clamp(9px, 1.4vw, 14px);
+  cursor: zoom-in;
+}
+.modal__body img:first-of-type { margin-top: 0; }
+
+/* image zoom (lightbox) */
+.zoom { display: grid; place-items: center; padding: clamp(20px, 5vw, 64px); }
+.zoom__fig {
+  position: relative; z-index: 1; margin: 0;
+  display: grid;
+  max-width: min(1000px, 86vw);
+  max-height: 80vh;
+  cursor: zoom-out;
+}
+.zoom__fig img {
+  grid-area: 1 / 1;
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto; height: auto;
+  margin: auto;
+  opacity: 0;
+  transition: opacity 0.28s var(--ease);
+}
+.zoom__fig img.shown { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .zoom__fig img { transition: opacity 0.1s linear; } }
+.zoom__nav {
+  position: absolute;
+  top: 50%; translate: 0 -50%;
+  z-index: 2;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 0; background: none;
+  color: var(--text);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease);
+}
+.zoom__nav:hover { opacity: 1; }
+.zoom__nav svg { width: 22px; height: 22px; }
+.zoom__prev { left: clamp(6px, 2vw, 22px); }
+.zoom__next { right: clamp(6px, 2vw, 22px); }
+.zoom__nav[disabled] { opacity: 0.16; cursor: default; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal:not(.modal--out) .modal__scrim,
+  .zoom:not(.zoom--out) .zoom__scrim { animation: fadeIn 0.26s var(--ease); }
+  .modal:not(.modal--out) .modal__card { animation: cardIn 0.32s var(--ease); }
+  .zoom:not(.zoom--out) .zoom__fig { animation: cardIn 0.3s var(--ease); }
+  .modal--out .modal__scrim, .modal--out .modal__card,
+  .zoom--out .zoom__scrim, .zoom--out .zoom__fig { animation: fadeIn 0.2s var(--ease) reverse forwards; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  @keyframes cardIn { from { opacity: 0; transform: scale(0.985); } }
+}
+
+/* ============================================================
+   Hoops — the basketball hiding under the mark
+   ============================================================ */
+.hoops {
+  position: fixed; inset: 0; z-index: 30;
+  pointer-events: none;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.hoops.on { opacity: 1; }
+.hoops[hidden] { display: none; }
+
+/* the court sits in the empty band left of the content — JS sets --court-x */
+.hoops__rig {
+  position: absolute;
+  left: calc(var(--court-x, 15vw) + var(--drift, 0px));
+  top: clamp(50px, 10vh, 110px);
+  width: clamp(120px, 14vw, 164px);
+  translate: -50% 0;
+}
+.hoops__rig svg { width: 100%; height: auto; overflow: visible; display: block; }
+/* a pane of the same frosted glass as the project modal, behind the rim.
+   the court is empty behind it, so the glossy sheen is drawn into the
+   panel itself rather than relying on blurring content that isn't there */
+.hoops__board {
+  position: absolute;
+  left: 18%; right: 18%; top: 7%; height: 42%;
+  border-radius: 10%;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #fff 55%, transparent) 0%,
+      color-mix(in srgb, var(--page) 40%, transparent) 45%,
+      color-mix(in srgb, var(--page) 58%, transparent) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+  backdrop-filter: blur(20px) saturate(1.7);
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 65%, transparent),
+    0 4px 10px -8px rgba(0, 0, 0, 0.2);
+}
+.hoops__board::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 32%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hoops__board { background: color-mix(in srgb, var(--page) 88%, transparent); }
+}
+/* the rim picks up the same light-grey, glassy tone as the backboard */
+.hoops__rim-stop { stop-color: var(--muted); }
+.hoops__rim, .hoops__rim-inner { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.14)); }
+.hoops__rim-inner { stroke: var(--muted); opacity: 0.4; }
+.hoops__net { stroke: var(--muted); transform-box: fill-box; transform-origin: top center; }
+.hoops__net.swish { animation: netSwish 0.55s var(--ease); }
+@keyframes netSwish { 25% { transform: scaleY(1.22) scaleX(0.94); } 60% { transform: scaleY(0.95); } 100% { transform: none; } }
+
+.hoops__score {
+  position: absolute; left: 50%; top: -26px;
+  translate: -50% 0;
+  font-size: var(--fs-sm); color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.hoops__score.pop { animation: scorePop 0.4s var(--ease); }
+@keyframes scorePop { 40% { transform: scale(1.45); } }
+
+/* an actual basketball — a punchier, more saturated orange sphere */
+.hoops__ball {
+  position: absolute;
+  left: var(--court-x, 15vw);
+  top: 46vh;
+  width: clamp(34px, 3vw, 42px); aspect-ratio: 1;
+  border: 0; padding: 0; margin: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #ffb15c 0%, #ff7a1f 45%, #d3520a 100%);
+  translate: -50% 0;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+.hoops__ball svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hoops__seam { stroke: rgba(0, 0, 0, 0.55); }
+.hoops__seam--edge { stroke: rgba(0, 0, 0, 0.3); }
+.hoops__ball:active { cursor: grabbing; }
+.hoops__ball.flying { cursor: default; }
+
+/* a quiet viewfinder ring that appears around the ball while aiming */
+.hoops__reticle {
+  position: absolute; inset: -38%;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.82);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.hoops.aiming .hoops__reticle { opacity: 0.32; transform: scale(1); }
+
+.hoops__hint {
+  position: absolute;
+  left: var(--court-x, 15vw);
+  top: calc(46vh - 26px);
+  translate: -50% 0;
+  margin: 0; white-space: nowrap;
+  font-size: var(--fs-sm); color: var(--muted);
+  transition: opacity 0.3s var(--ease);
+}
+.hoops__hint.gone { opacity: 0; }
+
+.hoops__aim { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.hoops__aim line { stroke: var(--text); stroke-width: 1.4; stroke-dasharray: 2 5; opacity: 0; transition: opacity 0.15s; }
+.hoops.aiming .hoops__aim line { opacity: 0.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hoops__reticle { transition: opacity 0.1s linear; }
+}
+
+@media (max-width: 820px), (hover: none) {
+  .hoops, .hoops.on { display: none; }
+}
+
+/* ============================================================
+   Motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .fade { opacity: 0; transform: translateY(7px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  .fade.in { opacity: 1; transform: none; }
+}
