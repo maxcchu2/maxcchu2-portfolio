@@ -19,6 +19,7 @@
 
   --bay: min(50%, 528px);
   --bay-right: clamp(52px, 15vw, 280px);   /* gap from the right edge — nudges the column toward centre */
+  --shot-gap: clamp(12px, 2vw, 20px);      /* gap between paired case images — also the min. edge gap */
   --intro-w: 40ch;
   --pad-y: clamp(56px, 9vw, 116px);
   --block-gap: clamp(52px, 7.5vw, 100px);
@@ -216,11 +217,11 @@ p { margin: 0 0 1.15em; }
   left: var(--ax, 20vw);
   top: var(--ay, 40vh);
   translate: -50% -50%;
-  width: min(46vw, 620px);
-  height: min(46vw, 620px);
+  width: min(30vw, 400px);
+  height: min(30vw, 400px);
   border-radius: 50%;
   background: radial-gradient(circle, color-mix(in srgb, var(--mark-a) 20%, transparent), transparent 72%);
-  filter: blur(46px);
+  filter: blur(36px);
   z-index: -1;
   opacity: 0;
   pointer-events: none;
@@ -300,17 +301,19 @@ p { margin: 0 0 1.15em; }
 .case__facts {
   display: grid; grid-template-columns: 7.5rem 1fr; gap: 7px 1.1rem;
   font-size: var(--fs-sm); border-top: 1px solid var(--line);
-  padding-top: 16px; margin: clamp(26px, 4vw, 40px) calc(-1 * var(--bay-right)) var(--block-gap) 0;
+  padding-top: 16px;
+  margin: clamp(26px, 4vw, 40px) calc(-1 * var(--bay-right) + 2 * var(--shot-gap)) var(--block-gap) 0;
 }
 .case__facts dt { color: var(--muted); }
 .case__facts dd { margin: 0; }
-/* shots bleed to the real right edge, same move as the home rail */
+/* shots bleed most of the way to the real right edge, but keep a real
+   gap there — at least as wide as the gap between two paired images */
 .case__shots {
-  display: flex; flex-direction: column; gap: clamp(12px, 2vw, 20px);
-  margin-right: calc(-1 * var(--bay-right));
+  display: flex; flex-direction: column; gap: var(--shot-gap);
+  margin-right: calc(-1 * var(--bay-right) + 2 * var(--shot-gap));
 }
 .case__shots img { width: 100%; display: block; background: var(--line); cursor: zoom-in; }
-.case__row { display: flex; gap: clamp(12px, 2vw, 20px); }
+.case__row { display: flex; gap: var(--shot-gap); }
 .case__row img { flex: 1 1 0; min-width: 0; }
 
 /* a slot that quietly crossfades between a few near-identical shots
@@ -327,7 +330,7 @@ p { margin: 0 0 1.15em; }
 
 /* the hairline rules frame the same width as the images above them */
 .case__nav {
-  margin: var(--block-gap) calc(-1 * var(--bay-right)) 0 0;
+  margin: var(--block-gap) calc(-1 * var(--bay-right) + 2 * var(--shot-gap)) 0 0;
   padding-top: 16px; border-top: 1px solid var(--line);
   display: flex; justify-content: space-between; gap: 2rem; font-size: var(--fs-sm);
 }
