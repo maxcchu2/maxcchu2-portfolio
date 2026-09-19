@@ -178,7 +178,8 @@ ZOOM = """<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label
   </div>"""
 
 THEME_INIT = ("<script>(function(){try{var t=localStorage.getItem('theme');"
-              "if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>")
+              "if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);"
+              "}catch(e){}})();</script>")
 
 I_MODE = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">'
           '<path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/></svg>')

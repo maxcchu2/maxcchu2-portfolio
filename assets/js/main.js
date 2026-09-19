@@ -10,9 +10,16 @@
   /* ---------------- themes: light / dark / special ---------------- */
   function stored() { try { return localStorage.getItem("theme"); } catch (e) { return null; } }
   function save(v) { try { localStorage.setItem("theme", v); } catch (e) {} }
+  function forget() { try { localStorage.removeItem("theme"); } catch (e) {} }
   function sysDark() { return matchMedia("(prefers-color-scheme: dark)").matches; }
   function theme() { return root.getAttribute("data-theme") || (sysDark() ? "dark" : "light"); }
-  function setTheme(v) { root.setAttribute("data-theme", v); save(v); reflect(); }
+  function setTheme(v) {
+    root.setAttribute("data-theme", v);
+    // special is a toy you switch on for a moment, not a saved preference —
+    // a fresh visit always lands on the plain site
+    if (v === "special") forget(); else save(v);
+    reflect();
+  }
 
   var tools = document.querySelector(".tools");
   function reflect() {
@@ -36,7 +43,7 @@
 
   /* ---------------- smooth page scroll ---------------- */
   if (!reduce && window.Lenis) {
-    lenis = new window.Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, touchMultiplier: 1.6 });
+    lenis = new window.Lenis({ lerp: 0.2, wheelMultiplier: 1.15, smoothWheel: true, touchMultiplier: 1.6 });
     (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })();
   }
 
@@ -67,8 +74,8 @@
       e.preventDefault();
       if (reduce) { rail.scrollLeft += d; return; }
       pos = rail.scrollLeft;
-      vel += d * 0.28;
-      vel = Math.max(-46, Math.min(46, vel));
+      vel += d * 0.16;
+      vel = Math.max(-30, Math.min(30, vel));
       kick();
     }, { passive: false });
 
@@ -79,7 +86,7 @@
       e.preventDefault();
       pos = clamp(pos - dx);
       rail.scrollLeft = pos;
-      vel = (-dx / dt) * 15;
+      vel = (-dx / dt) * 10;
       lastX = e.clientX; lastT = now;
     }
     function onUp(e) {
@@ -90,7 +97,7 @@
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       wasDrag = Math.abs(e.clientX - downX) > 8;
-      vel = Math.max(-64, Math.min(64, vel));
+      vel = Math.max(-40, Math.min(40, vel));
       if (wasDrag && Math.abs(vel) > 0.5) kick();
     }
     rail.addEventListener("pointerdown", function (e) {
