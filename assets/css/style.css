@@ -9,7 +9,7 @@
 :root {
   --page: #ffffff;
   --text: #1a1a1a;
-  --muted: #9a9a97;
+  --muted: #737370;
   --line: #ececea;
   --mark-a: #8b78ea;
   --mark-b: #cabff8;
@@ -31,15 +31,15 @@
 }
 
 :root[data-theme="dark"] {
-  --page: #121211; --text: #ededeb; --muted: #77776f; --line: #292927;
+  --page: #121211; --text: #ededeb; --muted: #8a8a85; --line: #292927;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="special"]) {
-    --page: #121211; --text: #ededeb; --muted: #77776f; --line: #292927;
+    --page: #121211; --text: #ededeb; --muted: #8a8a85; --line: #292927;
   }
 }
 :root[data-theme="special"] {
-  --page: #3a5be0; --text: #ffe11a; --muted: #b9c6ff;
+  --page: #3a5be0; --text: #ffe11a; --muted: #e6ebff;
   --line: rgba(255, 255, 255, 0.22); --sel: #ffe11a;
 }
 :root[data-theme="special"] ::selection { color: #3a5be0; }
@@ -87,7 +87,11 @@ p { margin: 0 0 1.15em; }
   :root { --bay: 100%; --bay-right: clamp(20px, 6vw, 40px); }
 }
 
-.eyebrow { font-size: var(--fs-sm); color: var(--muted); margin: 0 0 20px; }
+.eyebrow { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); margin: 0 0 20px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 
 .top {
   max-width: var(--intro-w);
@@ -97,6 +101,7 @@ p { margin: 0 0 1.15em; }
 .mark {
   display: block;
   width: 14px; height: 14px; border-radius: 50%;
+  border: 0; padding: 0; margin: 0;
   background: radial-gradient(circle at 70% 74%, #ffffff 0%, var(--mark-b) 42%, var(--mark-a) 100%);
   flex: none;
 }

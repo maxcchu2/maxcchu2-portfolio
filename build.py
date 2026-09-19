@@ -209,7 +209,7 @@ def head(title, desc, prefix):
 
 def top():
     return (f'<div class="top">\n'
-            f'    <span class="mark" aria-hidden="true"></span>\n'
+            f'    <button type="button" class="mark" aria-label="Play basketball" aria-expanded="false"></button>\n'
             f'    <div class="tools">\n'
             f'      <button type="button" data-act="special" aria-pressed="false" aria-label="Special mode">{I_STAR}</button>\n'
             f'      <button type="button" data-act="mode" aria-label="Switch theme">{I_MODE}</button>\n'
@@ -222,10 +222,14 @@ def scripts(prefix):
 
 # ---------------------------------------------------------------------------
 def build_index():
+    # the first slide is the first thing anyone sees: load it eagerly, the rest lazily
+    def load_attr(n):
+        return 'fetchpriority="high"' if n == 0 else 'loading="lazy"'
     slides = "".join(
         f'<a class="slide" href="work/{p["slug"]}.html" data-project="{p["slug"]}" aria-label="Open {p["title"]}">'
-        f'<img loading="lazy" src="assets/img/{p["slug"]}/{p["hero"]:02d}.jpg" alt="{p["client"]} — {p["title"]}"></a>'
-        for p in PROJECTS
+        f'<img {load_attr(n)} src="assets/img/{p["slug"]}/{p["hero"]:02d}.jpg" '
+        f'alt="{p["client"]} — {p["title"]}"></a>'
+        for n, p in enumerate(PROJECTS)
     )
     wrows = "".join(
         f'    <a class="wrow" href="work/{p["slug"]}.html" data-project="{p["slug"]}" '
@@ -274,6 +278,7 @@ def build_index():
     html += f"""<main id="main" class="sheet">
   <div class="bay">
   {top()}
+  <h1 class="sr-only">{NAME}, campaign and brand designer</h1>
 
   <div class="intro fade">
     {intro}
@@ -281,7 +286,7 @@ def build_index():
 
   <section class="work fade" data-view="grid">
     <div class="work__bar">
-      <p class="eyebrow">selected work</p>
+      <h2 class="eyebrow">selected work</h2>
       <div class="viewtoggle" role="group" aria-label="View">
         <button type="button" data-view="grid" aria-pressed="true" aria-label="Image view">{I_GRID}</button>
         <button type="button" data-view="list" aria-pressed="false" aria-label="List view">{I_LIST}</button>
@@ -295,7 +300,7 @@ def build_index():
   </section>
 
   <section class="exp fade">
-    <p class="eyebrow">experiences</p>
+    <h2 class="eyebrow">experiences</h2>
 {rows}  </section>
 
   <footer class="foot">
@@ -336,7 +341,8 @@ def build_project(i, p):
     def img_tag(k, cls=""):
         alt = p["title"] if k == hero_img else f'{p["title"]}, detail'
         c = f' class="{cls}"' if cls else ""
-        return f'<img loading="lazy" src="{prefix}assets/img/{p["slug"]}/{k:02d}.jpg" alt="{alt}"{c}>'
+        load = 'fetchpriority="high"' if k == hero_img else 'loading="lazy"'
+        return f'<img {load} src="{prefix}assets/img/{p["slug"]}/{k:02d}.jpg" alt="{alt}"{c}>'
 
     # solo/pair rhythm for the shots below the hero — not every row shares,
     # so a paired row reads as a deliberate choice rather than a default.
@@ -377,7 +383,8 @@ def build_project(i, p):
         if kind == "row":
             return f'<div class="case__row">{"".join(img_tag(k) for k in imgs)}</div>'
         slide_imgs = "".join(img_tag(k, "shown" if idx == 0 else "") for idx, k in enumerate(imgs))
-        return f'<div class="case__slide" data-slide>{slide_imgs}</div>'
+        return (f'<div class="case__slide" data-slide tabindex="0" role="group" '
+                f'aria-label="Screens that cycle on their own; hover or focus to pause">{slide_imgs}</div>')
 
     shots = "".join(render_row(kind, imgs) for kind, imgs in rows)
 

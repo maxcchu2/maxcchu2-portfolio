@@ -324,11 +324,19 @@
     shots.querySelectorAll(".case__slide").forEach(function (slide) {
       var imgs = slide.querySelectorAll("img");
       if (imgs.length < 2) return;
-      var i = 0;
-      setInterval(function () {
+      var i = 0, held = false, steps = 0, MAX_STEPS = imgs.length * 3;
+      var hold = function () { held = true; }, release = function () { held = false; };
+      slide.addEventListener("pointerenter", hold);
+      slide.addEventListener("pointerleave", release);
+      slide.addEventListener("focusin", hold);
+      slide.addEventListener("focusout", release);
+      var timer = setInterval(function () {
+        if (held || document.hidden) return;
         imgs[i].classList.remove("shown");
         i = (i + 1) % imgs.length;
         imgs[i].classList.add("shown");
+        // settle after a few loops instead of cycling forever
+        if (++steps >= MAX_STEPS) clearInterval(timer);
       }, 2800);
     });
   }
@@ -430,7 +438,11 @@
       e.preventDefault();                          // mark is the home link; on home it opens the game
       if (canPlay) toggle();
     });
-    if (!canPlay) return;
+    if (!canPlay) {                                // the game is off here, so hide the dead control
+      mark.setAttribute("aria-hidden", "true");
+      mark.tabIndex = -1;
+      return;
+    }
 
     var ball = document.getElementById("hoopBall");
     var scoreEl = document.getElementById("hoopScore");
@@ -566,6 +578,19 @@
     }
     ball.addEventListener("pointerup", endDrag);
     ball.addEventListener("pointercancel", endDrag);
+
+    // keyboard: Enter or Space takes a shot. It aims at the rim (so it still
+    // works once the hoop starts drifting) with a little wobble, so it can miss.
+    ball.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      if (dragging || raf || st.vx || st.vy) return;
+      measure();
+      var bx = home.x + st.x, by = home.y + st.y;
+      var dx = (rim.lx + rim.rx) / 2 - bx;
+      var jitter = function (n) { return (Math.random() - 0.5) * 2 * n; };
+      shoot(bx - dx / 8.4 + jitter(9), by + 205 + jitter(12));
+    });
 
     window.addEventListener("resize", function () {
       if (active && !dragging) { setCourt(); if (!raf) { reset(); measure(); } }
